@@ -6,21 +6,21 @@
 					<v-container fluid>
 						<v-layout row>
 							<v-flex xs5 sm4 md3>
-								<v-card-media 
+								<v-responsive 
 									:src="meetup.imageUrl" 
 									height="144px">
-								</v-card-media>
+								</v-responsive>
 							</v-flex>
 							<v-flex xs7 sm8 md9>
 								<v-card-title primary-title>
 									<div>
 										<h2 class="white--text mb-0">{{ meetup.title}}</h2>
-										<div>{{ meetup.date }}</div>
+										<div>{{ meetup.date | date }}</div>
 									</div>
 								</v-card-title>
 								<v-card-actions>
-									<v-btn :to="'/reuniones/' + meetup.id">
-										<v-icon left light>arrow_forward</v-icon>
+									<v-btn color="error" :to="'/reuniones/' + meetup.id">
+										<v-icon light>arrow_forward</v-icon>
 										Ver Reunión
 									</v-btn>
 								</v-card-actions>

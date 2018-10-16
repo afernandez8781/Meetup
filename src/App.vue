@@ -12,6 +12,16 @@
           </v-list-tile-action>
           <v-list-tile-content>{{ item.title }}</v-list-tile-content>
         </v-list-tile>
+
+        <v-list-tile 
+          v-if="userIsAuthenticated"
+          @click="onLogout">
+          <v-list-tile-action>
+            <v-icon>exit_to_app</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>Cerrar sesión</v-list-tile-content>
+        </v-list-tile>
+
       </v-list>
     </v-navigation-drawer>
 
@@ -31,7 +41,17 @@
           :key="item.title"
           :to="item.link">
           <v-icon >{{ item.icon }}</v-icon>
-        {{ item.title }}</v-btn>
+        {{ item.title }}
+      </v-btn>
+
+      <v-btn 
+          v-if="userIsAuthenticated"
+          flat
+          @click="onLogout">
+          <v-icon dark>exit_to_app</v-icon>
+        Cerrar sesón
+      </v-btn>
+
       </v-toolbar-items>
     </v-toolbar>
 
@@ -47,15 +67,70 @@ export default {
   data () {
     return {
       sideNav: false,
-      menuItems: [
-        { icon: 'supervisor_account', title: 'Ver reunión', link: '/reuniones' },
-        { icon: 'room', title: 'Organizar reunión', link: '/reunion/nuevo' },
-        { icon: 'person', title: 'Perfil', link: '/perfil'},
+    }
+  },
+  computed: {
+    menuItems () {
+      let menuItems = [
         { icon: 'face', title: 'Regístrate', link: '/registrate' },
         { icon: 'lock_open', title: 'registrarse', link: '/registrarse' },
       ]
+      if (this.userIsAuthenticated) {
+        menuItems = [
+          { icon: 'supervisor_account', title: 'Ver reunión', link: '/reuniones' },
+          { icon: 'room', title: 'Organizar reunión', link: '/reunion/nuevo' },
+          { icon: 'person', title: 'Perfil', link: '/perfil'},
+        ]
+      }
+      return menuItems
+    },
+    userIsAuthenticated () {
+      return this.$store.getters.user !== null && this.$store.getters.user !== undefined
     }
   },
-  name: 'App'
+  methods: {
+    onLogout () {
+      this.$store.dispatch('logout')
+    }
+  }
 }
 </script>
+
+<style>
+  .custom-loader {
+    animation: loader 1s infinite;
+    display: flex;
+  }
+  @-moz-keyframes loader {
+    from {
+      transform: rotate(0);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @-webkit-keyframes loader {
+    from {
+      transform: rotate(0);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @-o-keyframes loader {
+    from {
+      transform: rotate(0);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @keyframes loader {
+    from {
+      transform: rotate(0);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+</style>

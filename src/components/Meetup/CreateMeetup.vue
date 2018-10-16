@@ -30,12 +30,14 @@
 					</v-layout>
 					<v-layout row>
 						<v-flex xs12 sm6 offset-sm3>
-							<v-text-field
-								name="imageUrl"
-								label="Ruta de la imagen"
-								id="imageUrl"
-								v-model="imageUrl"
-								required></v-text-field>
+							
+							<v-btn raised color="error" @click="onPickFile">Subir Imagen</v-btn>
+							<input 
+								type="file" 
+								style="display: none" 
+								ref="fileInput" 
+								accept="image/*"
+								@change="onFilePicked">
 						</v-flex>
 					</v-layout>
 					<v-layout row>
@@ -43,17 +45,17 @@
 							<img :src="imageUrl" height="150">
 						</v-flex>
 					</v-layout>
-<!-- 					<v-layout row>
+					<v-layout row>
 						<v-flex xs12 sm6 offset-sm3>
-							<v-text-field
+							<v-textarea
 								name="description"
 								label="Descripción"
 								id="description"
 								multi-line
 								v-model="description"
-								required></v-text-field>
+								required></v-textarea>
 						</v-flex>
-					</v-layout> -->
+					</v-layout>
 					<v-layout row>
 						<v-flex xs12 sm6 offset-sm3>
 							<h3>Elige una fecha y hora</h3>
@@ -61,14 +63,12 @@
 					</v-layout>
 					<v-layout row class="mb-2">
 						<v-flex xs12 sm6 offset-sm3>
-							<v-date-picker v-model="date"></v-date-picker>
-							<p>{{ date }}</p>
+							<v-date-picker v-model="date" locale="es"></v-date-picker>
 						</v-flex>
 					</v-layout>
 					<v-layout row>
 						<v-flex xs12 sm6 offset-sm3>
-							<v-time-picker v-model="time"></v-time-picker>
-							<p>{{ time }}</p>
+							<v-time-picker v-model="time" format="24hr"></v-time-picker>
 						</v-flex>
 					</v-layout>
 					<v-layout row>
@@ -80,7 +80,6 @@
 						</v-flex>
 					</v-layout>
 				</form>
-								{{submittableDateTime}}
 			</v-flex>
 		</v-layout>
 	</v-container>
@@ -95,7 +94,8 @@
 				imageUrl: '',
 				description: '',
 				date: null,
-				time: null
+				time: null,
+				image: null
 			}
 		},
 		computed: {
@@ -112,11 +112,11 @@
 					const minutes = this.time.match(/:(\d+)/)[1]
 					date.setHours(hours)
 					date.setMinutes(minutes)	
-				} else {
-					// date.setHours(this.time.getHours())
-					// date.setMinutes(this.time.getMinutes())
-				}
-				console.log(date)
+				} 
+				// else {
+				// 	date.setHours(this.time.getHours())
+				// 	date.setMinutes(this.time.getMinutes())
+				// }
 				return date
 			}
 		},
@@ -125,15 +125,35 @@
 				if (!this.formIsValid) {
 					return
 				}
+				if (!this.image) {
+					return
+				}
 				const meetupData = {
 					title: this.title,
 					location: this.location,
-					imageUrl: this.imageUrl,
+					image: this.image,
 					description: this.description,
-					date: new Date()
+					date: this.submittableDateTime
 				}
+
 				this.$store.dispatch('createMeetup', meetupData)
 				this.$router.push('/reuniones')
+			},
+			onPickFile () {
+				this.$refs.fileInput.click()
+			},
+			onFilePicked (event) {
+				const files = event.target.files
+				let filename = files[0].name
+				if (filename.lastIndexOf('.') <= 0) {
+					return alert('por favor suba una imagen valida')
+				}
+				const fileReader = new FileReader()
+				fileReader.addEventListener('load', () => {
+					this.imageUrl = fileReader.result
+				})
+				fileReader.readAsDataURL(files[0])
+				this.image = files[0]
 			}
 		}
 	}
